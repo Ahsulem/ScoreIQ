@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predict — ScoreIQ</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+
+    <!-- NAV -->
+    <nav class="nav">
+        <a href="/" class="nav-logo">Score<span>IQ</span></a>
+        <div style="display:flex;gap:12px;align-items:center;">
+            <a href="{{ url_for('history') }}" style="font-size:.85rem;font-weight:700;color:var(--gray-2);text-decoration:none;letter-spacing:-.2px;">History</a>
+            {% if current_user.is_authenticated %}
+                <span style="font-size:.82rem;font-weight:700;color:var(--gray-2);letter-spacing:-.2px;">{{ current_user.name or current_user.email }}</span>
+                <a href="{{ url_for('logout') }}" style="font-size:.85rem;font-weight:700;color:var(--gray-2);text-decoration:none;letter-spacing:-.2px;">Log Out</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" style="font-size:.85rem;font-weight:700;color:var(--gray-2);text-decoration:none;letter-spacing:-.2px;">Log In</a>
+            {% endif %}
+            <a href="/" class="nav-cta">&#8592; Home</a>
+        </div>
+    </nav>
+
+    <!-- FLASH MESSAGES -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div style="position:fixed;top:68px;left:50%;transform:translateX(-50%);z-index:9999;width:min(500px,90vw);">
+                {% for category, message in messages %}
+                    <div class="flash-msg flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- SPLIT LAYOUT -->
+    <div class="predict-wrapper">
+
+        <!-- LEFT PANEL -->
+        <div class="predict-left">
+            <p class="predict-eyebrow">AI Prediction Engine</p>
+            <h2 class="predict-headline">
+                What will your<br>
+                <span class="accent">Maths</span><br>
+                score be?
+            </h2>
+            <p class="predict-desc">
+                Fill in your academic background and our model — trained on 1,000 real student records — will predict your maths exam score instantly.
+            </p>
+            <div class="predict-chips">
+                <span class="chip">Reading Score</span>
+                <span class="chip">Writing Score</span>
+                <span class="chip">Gender</span>
+                <span class="chip">Ethnicity</span>
+                <span class="chip">Parent Education</span>
+                <span class="chip">Lunch Type</span>
+                <span class="chip">Test Prep</span>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL -->
+        <div class="predict-right">
+
+            <div class="form-card">
+                <h3 class="form-title">Student Profile <span>— fill all fields</span></h3>
+                <form action="{{ url_for('predict_datapoint') }}" method="post">
+                    <div class="form-grid">
+
+                        <div class="form-group">
+                            <label class="form-label">Gender</label>
+                            <select class="form-control" name="gender" required>
+                                <option selected disabled value="">Select gender</option>
+                                <option value="male" {% if gender == 'male' %}selected{% endif %}>Male</option>
+                                <option value="female" {% if gender == 'female' %}selected{% endif %}>Female</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Race / Ethnicity</label>
+                            <select class="form-control" name="ethnicity" required>
+                                <option selected disabled value="">Select ethnicity</option>
+                                <option value="group A" {% if ethnicity == 'group A' %}selected{% endif %}>African American</option>
+                                <option value="group B" {% if ethnicity == 'group B' %}selected{% endif %}>Hispanic / Latino</option>
+                                <option value="group C" {% if ethnicity == 'group C' %}selected{% endif %}>Caucasian / White</option>
+                                <option value="group D" {% if ethnicity == 'group D' %}selected{% endif %}>Asian / Pacific Islander</option>
+                                <option value="group E" {% if ethnicity == 'group E' %}selected{% endif %}>Native American</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group full">
+                            <label class="form-label">Parental Level of Education</label>
+                            <select class="form-control" name="parental_level_of_education" required>
+                                <option selected disabled value="">Select education level</option>
+                                <option value="associate's degree" {% if parental_level_of_education == "associate's degree" %}selected{% endif %}>Associate's Degree</option>
+                                <option value="bachelor's degree" {% if parental_level_of_education == "bachelor's degree" %}selected{% endif %}>Bachelor's Degree</option>
+                                <option value="high school" {% if parental_level_of_education == 'high school' %}selected{% endif %}>High School</option>
+                                <option value="master's degree" {% if parental_level_of_education == "master's degree" %}selected{% endif %}>Master's Degree</option>
+                                <option value="some college" {% if parental_level_of_education == 'some college' %}selected{% endif %}>Some College</option>
+                                <option value="some high school" {% if parental_level_of_education == 'some high school' %}selected{% endif %}>Some High School</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Lunch Type</label>
+                            <select class="form-control" name="lunch" required>
+                                <option selected disabled value="">Select lunch type</option>
+                                <option value="free/reduced" {% if lunch == 'free/reduced' %}selected{% endif %}>Free / Reduced</option>
+                                <option value="standard" {% if lunch == 'standard' %}selected{% endif %}>Standard</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Test Preparation Course</label>
+                            <select class="form-control" name="test_preparation_course" required>
+                                <option selected disabled value="">Select status</option>
+                                <option value="none" {% if test_preparation_course == 'none' %}selected{% endif %}>None</option>
+                                <option value="completed" {% if test_preparation_course == 'completed' %}selected{% endif %}>Completed</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group score-group">
+                            <label class="form-label">Writing Score</label>
+                            <input class="form-control" type="number" name="writing_score"
+                                placeholder="0 – 100" min="0" max="100"
+                                value="{{ writing_score }}" required />
+                            <span class="score-badge">/ 100</span>
+                        </div>
+
+                        <div class="form-group score-group">
+                            <label class="form-label">Reading Score</label>
+                            <input class="form-control" type="number" name="reading_score"
+                                placeholder="0 – 100" min="0" max="100"
+                                value="{{ reading_score }}" required />
+                            <span class="score-badge">/ 100</span>
+                        </div>
+
+                        <div class="form-group full">
+                            <button class="btn-submit" type="submit">Predict Maths Score &rarr;</button>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+
+            {% if results %}
+            <div class="result-card" id="result-section">
+                <div>
+                    <div class="result-label">Predicted Maths Score</div>
+                    <div style="display:flex;align-items:flex-end;gap:8px;">
+                        <div class="result-score">{{ results }}</div>
+                        <div class="result-score-unit">/ 100</div>
+                    </div>
+                </div>
+                <div class="result-icon">&#127891;</div>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+    <style>
+        @keyframes popIn {
+            0%   { opacity: 0; transform: scale(.85) translateY(18px); }
+            65%  { transform: scale(1.03) translateY(-3px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        #result-section {
+            animation: popIn .45s cubic-bezier(.34,1.56,.64,1) both;
+        }
+    </style>
+
+    {% if results %}
+    <script>
+        window.addEventListener('DOMContentLoaded', function () {
+            var el = document.getElementById('result-section');
+            if (el) {
+                setTimeout(function () {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 80);
+            }
+        });
+    </script>
+    {% endif %}
+
+</body>
+</html>

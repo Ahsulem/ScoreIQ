@@ -1,0 +1,22 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Log files
+logs/
+
+# System generated files
+.DS_Store
+
+# Model artifacts file
+artifacts/
+
+# Catboost training files
+catboost_info/

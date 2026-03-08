@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History &mdash; ScoreIQ</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        /* ── Page layout ── */
+        .history-page {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 60px 5vw 80px;
+        }
+
+        /* ── Header row ── */
+        .history-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .history-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 900;
+            letter-spacing: -1.5px;
+            line-height: 1.05;
+            color: var(--black);
+        }
+        .history-title .accent {
+            color: var(--accent);
+            -webkit-text-stroke: 1.5px var(--black);
+        }
+        .history-count {
+            font-size: .75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--gray-3);
+            margin-top: 6px;
+        }
+
+        /* ── Table card ── */
+        .table-card {
+            border-radius: var(--radius-lg);
+            border: 1.5px solid var(--gray-5);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+        .tbl {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .82rem;
+        }
+        .tbl thead {
+            background: var(--black);
+            color: var(--white);
+        }
+        .tbl thead th {
+            padding: 16px 18px;
+            text-align: left;
+            font-size: .68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .7px;
+            white-space: nowrap;
+        }
+        .tbl thead th:first-child { border-radius: 0; }
+        .tbl tbody tr {
+            border-bottom: 1px solid var(--gray-5);
+            transition: background var(--transition);
+        }
+        .tbl tbody tr:last-child { border-bottom: none; }
+        .tbl tbody tr:hover { background: #f7f7f5; }
+        .tbl tbody td {
+            padding: 15px 18px;
+            color: var(--gray-2);
+            font-weight: 500;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+        /* ID badge */
+        .td-id {
+            font-size: .72rem;
+            font-weight: 800;
+            color: var(--gray-3);
+            letter-spacing: .3px;
+        }
+        /* Score pill */
+        .score-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--black);
+            color: var(--accent);
+            font-weight: 900;
+            font-size: .85rem;
+            letter-spacing: -.3px;
+            padding: 5px 14px;
+            border-radius: var(--radius-pill);
+        }
+        /* Timestamp muted */
+        .td-ts {
+            font-size: .75rem;
+            color: var(--gray-3);
+            font-weight: 500;
+        }
+        /* Gender / prep tags */
+        .tag {
+            display: inline-block;
+            background: var(--gray-5);
+            color: var(--gray-2);
+            font-size: .7rem;
+            font-weight: 700;
+            text-transform: capitalize;
+            letter-spacing: .3px;
+            padding: 4px 10px;
+            border-radius: var(--radius-pill);
+        }
+        .tag-green {
+            background: #e6f9ef;
+            color: #1a7a42;
+        }
+        .tag-yellow {
+            background: #fffbe6;
+            color: #7a6000;
+        }
+
+        /* ── Empty state ── */
+        .empty-state {
+            padding: 80px 40px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+        .empty-icon {
+            font-size: 3.5rem;
+            line-height: 1;
+        }
+        .empty-title {
+            font-size: 1.3rem;
+            font-weight: 800;
+            letter-spacing: -.5px;
+            color: var(--black);
+        }
+        .empty-sub {
+            font-size: .9rem;
+            color: var(--gray-3);
+            max-width: 300px;
+            line-height: 1.6;
+        }
+
+        /* ── Scrollable on small screens ── */
+        .table-scroll { overflow-x: auto; }
+
+        /* ── Saved badge ── */
+        .badge-saved {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #e6f9ef;
+            color: #1a7a42;
+            font-size: .7rem;
+            font-weight: 800;
+            letter-spacing: .2px;
+            padding: 4px 11px;
+            border-radius: var(--radius-pill);
+            white-space: nowrap;
+        }
+
+        /* ── Sign-in banner ── */
+        .signin-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            background: var(--black);
+            color: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 22px 28px;
+            margin-bottom: 24px;
+        }
+        .signin-banner-text {
+            font-size: .9rem;
+            font-weight: 600;
+            letter-spacing: -.1px;
+            line-height: 1.4;
+        }
+        .signin-banner-text strong {
+            font-weight: 900;
+            color: var(--accent);
+        }
+        .signin-banner-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-signin {
+            background: var(--accent);
+            color: var(--black);
+            border: none;
+            border-radius: var(--radius-pill);
+            padding: 10px 22px;
+            font-size: .85rem;
+            font-weight: 800;
+            letter-spacing: -.2px;
+            text-decoration: none;
+            transition: background .2s, transform .15s;
+            white-space: nowrap;
+        }
+        .btn-signin:hover {
+            background: #f0d800;
+            transform: translateY(-1px);
+        }
+        .btn-github {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #ffffff18;
+            border: 1.5px solid #ffffff28;
+            color: #fff;
+            text-decoration: none;
+            transition: background .2s, border-color .2s;
+            flex-shrink: 0;
+        }
+        .btn-github:hover {
+            background: #ffffff30;
+            border-color: #ffffff55;
+        }
+        .btn-github i {
+            font-size: 18px;
+        }
+
+        @media (max-width: 768px) {
+            .history-header { flex-direction: column; align-items: flex-start; }
+            .signin-banner { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAV -->
+    <nav class="nav">
+        <a href="/" class="nav-logo">Score<span>IQ</span></a>
+        <div style="display:flex;gap:12px;align-items:center;">
+            <a href="{{ url_for('predict_datapoint') }}" style="font-size:.85rem;font-weight:700;color:var(--gray-2);text-decoration:none;letter-spacing:-.2px;">Predictor</a>
+            {% if current_user.is_authenticated %}
+                <span style="font-size:.82rem;font-weight:700;color:var(--gray-2);letter-spacing:-.2px;">{{ current_user.name or current_user.email }}</span>
+                <a href="{{ url_for('logout') }}" style="font-size:.85rem;font-weight:700;color:var(--gray-2);text-decoration:none;letter-spacing:-.2px;">Log Out</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" style="font-size:.85rem;font-weight:700;color:var(--gray-2);text-decoration:none;letter-spacing:-.2px;">Log In</a>
+            {% endif %}
+            <a href="/" class="nav-cta">&#8592; Home</a>
+        </div>
+    </nav>
+
+    <!-- FLASH MESSAGES -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div style="position:fixed;top:68px;left:50%;transform:translateX(-50%);z-index:9999;width:min(500px,90vw);">
+                {% for category, message in messages %}
+                    <div class="flash-msg flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    {% set eth_map = {
+        'group A': 'African American',
+        'group B': 'Hispanic / Latino',
+        'group C': 'Caucasian / White',
+        'group D': 'Asian / Pacific Islander',
+        'group E': 'Native American'
+    } %}
+
+    <div class="history-page">
+
+        <!-- Header -->
+        <div class="history-header">
+            <div>
+                <h1 class="history-title">Prediction <span class="accent">History</span></h1>
+                <p class="history-count">
+                    {% if predictions %}
+                        {{ predictions | length }} record{% if predictions | length != 1 %}s{% endif %} &mdash; newest first
+                        {% if current_user.is_authenticated %}
+                            &bull; <span style="color:#1a7a42;font-weight:800;">saved to account</span>
+                        {% else %}
+                            &bull; session only
+                        {% endif %}
+                    {% else %}
+                        No records yet
+                    {% endif %}
+                </p>
+            </div>
+            <a href="{{ url_for('predict_datapoint') }}" class="btn-primary">
+                    + New Prediction
+                </a>
+            </div>
+        </div>
+
+        <!-- Sign-in banner (anonymous only) -->
+        {% if not current_user.is_authenticated %}
+        <div class="signin-banner">
+            <p class="signin-banner-text">
+                <strong>Create an account or sign in</strong><br>
+                to save your prediction history permanently.
+            </p>
+            <div class="signin-banner-actions">
+                <a href="{{ url_for('login') }}" class="btn-signin">Login</a>
+                <a href="{{ url_for('login_github') }}" class="btn-github" title="Continue with GitHub" aria-label="Continue with GitHub">
+                    <i class="fab fa-github"></i>
+                </a>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Table -->
+        <div class="table-card">
+            {% if predictions %}
+            <div class="table-scroll">
+                <table class="tbl">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Gender</th>
+                            <th>Ethnicity</th>
+                            <th>Parental Education</th>
+                            <th>Lunch</th>
+                            <th>Test Prep</th>
+                            <th>Reading</th>
+                            <th>Writing</th>
+                            <th>Predicted Score</th>
+                            <th>Timestamp</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in predictions %}
+                        <tr>
+                            <td class="td-id">{{ p['index'] }}</td>
+                            <td><span class="tag">{{ p['gender'] }}</span></td>
+                            <td>{{ eth_map.get(p['race_ethnicity'], p['race_ethnicity']) }}</td>
+                            <td>{{ p['parental_education'] }}</td>
+                            <td>
+                                <span class="tag {% if p['lunch'] == 'standard' %}tag-green{% endif %}">
+                                    {{ p['lunch'] }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="tag {% if p['test_prep_course'] == 'completed' %}tag-yellow{% endif %}">
+                                    {{ p['test_prep_course'] }}
+                                </span>
+                            </td>
+                            <td>{{ p['reading_score'] }}</td>
+                            <td>{{ p['writing_score'] }}</td>
+                            <td><span class="score-pill">{{ "%.2f"|format(p['predicted_score']) }}</span></td>
+                            <td class="td-ts">{{ p['timestamp_display'] }}</td>
+                            <td>
+                                {% if p['saved'] %}
+                                    <span class="badge-saved">&#10003; Saved</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">📭</div>
+                <div class="empty-title">No predictions yet</div>
+                <div class="empty-sub">Make your first prediction and it will appear here instantly.</div>
+                <a href="{{ url_for('predict_datapoint') }}" class="btn-primary" style="margin-top:8px;">
+                    Make a Prediction &rarr;
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+
+</body>
+</html>

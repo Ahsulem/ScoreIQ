@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScoreIQ — Student Performance Predictor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+
+    <!-- NAV -->
+    <nav class="nav">
+        <a href="/" class="nav-logo">Score<span>IQ</span></a>
+        <div style="display:flex;gap:12px;align-items:center;">
+            <a href="{{ url_for('history') }}" style="font-size:.85rem;font-weight:700;color:var(--gray-2);text-decoration:none;letter-spacing:-.2px;">History</a>
+            {% if current_user.is_authenticated %}
+                <span style="font-size:.82rem;font-weight:700;color:var(--gray-2);letter-spacing:-.2px;">{{ current_user.name or current_user.email }}</span>
+                <a href="{{ url_for('logout') }}" class="nav-cta">Log Out</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" style="font-size:.85rem;font-weight:700;color:var(--gray-2);text-decoration:none;letter-spacing:-.2px;">Log In</a>
+                <a href="{{ url_for('predict_datapoint') }}" class="nav-cta">Get Started &rarr;</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- FLASH MESSAGES -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div style="position:fixed;top:68px;left:50%;transform:translateX(-50%);z-index:9999;width:min(500px,90vw);">
+                {% for category, message in messages %}
+                    <div class="flash-msg flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-badge">
+            <span class="hero-badge-dot"></span>
+            AI-Powered &middot; Instant Results
+        </div>
+        <h1 class="hero-headline">
+            Predict your<br>
+            Maths <span class="accent">Score</span><br>
+            in seconds.
+        </h1>
+        <p class="hero-sub">
+            Enter reading &amp; writing scores, background info, and our ML model returns your predicted maths result — trained on 1,000 real student records.
+        </p>
+        <div class="hero-actions">
+            <a href="{{ url_for('predict_datapoint') }}" class="btn-primary">Try the Predictor &rarr;</a>
+            <button type="button" class="btn-secondary" id="hiw-toggle" onclick="toggleHiw()">How it works</button>
+        </div>
+    </section>
+
+    <!-- STATS -->
+    <div class="stats">
+        <div class="stat-item">
+            <div class="stat-number">88<span>%</span></div>
+            <div class="stat-label">Model Accuracy (R&sup2;)</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">1<span>K</span></div>
+            <div class="stat-label">Training Records</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">7</div>
+            <div class="stat-label">Models Evaluated</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">&lt;1<span>s</span></div>
+            <div class="stat-label">Prediction Time</div>
+        </div>
+    </div>
+
+    <!-- HOW IT WORKS -->
+    <section class="hiw" id="how">
+        <div class="hiw-inner">
+            <span class="hiw-eyebrow">How it works</span>
+            <h2 class="hiw-title">Four steps from input<br>to your <span>predicted score</span>.</h2>
+
+            <div class="hiw-steps">
+
+                <!-- Step 1 -->
+                <div class="hiw-step">
+                    <div class="hiw-step-num">Step 01</div>
+                    <div class="hiw-step-icon">&#9997;&#65039;</div>
+                    <div class="hiw-step-title">Fill in your profile</div>
+                    <div class="hiw-step-desc">Enter your gender, ethnicity, parental education, lunch type, test prep status, and your reading &amp; writing scores.</div>
+                    <div class="hiw-step-tags">
+                        <span class="hiw-tag">Gender</span>
+                        <span class="hiw-tag">Ethnicity</span>
+                        <span class="hiw-tag">Scores</span>
+                    </div>
+                </div>
+
+                <div class="hiw-arrow">&rsaquo;</div>
+
+                <!-- Step 2 -->
+                <div class="hiw-step">
+                    <div class="hiw-step-num">Step 02</div>
+                    <div class="hiw-step-icon">&#128260;</div>
+                    <div class="hiw-step-title">Data gets cleaned</div>
+                    <div class="hiw-step-desc">Your inputs are standardised and encoded &mdash; numbers are scaled, categories are converted to a format the model understands.</div>
+                    <div class="hiw-step-tags">
+                        <span class="hiw-tag">Scaling</span>
+                        <span class="hiw-tag">Encoding</span>
+                    </div>
+                </div>
+
+                <div class="hiw-arrow">&rsaquo;</div>
+
+                <!-- Step 3 -->
+                <div class="hiw-step">
+                    <div class="hiw-step-num">Step 03</div>
+                    <div class="hiw-step-icon">&#129504;</div>
+                    <div class="hiw-step-title">Model makes a prediction</div>
+                    <div class="hiw-step-desc">The best-performing model (out of 7 trained) runs the numbers through patterns it learned from 1,000 real student records.</div>
+                    <div class="hiw-step-tags">
+                        <span class="hiw-tag">ML Model</span>
+                        <span class="hiw-tag">88% R&sup2;</span>
+                    </div>
+                </div>
+
+                <div class="hiw-arrow">&rsaquo;</div>
+
+                <!-- Step 4 -->
+                <div class="hiw-step">
+                    <div class="hiw-step-num">Step 04</div>
+                    <div class="hiw-step-icon">&#127891;</div>
+                    <div class="hiw-step-title">You get your score</div>
+                    <div class="hiw-step-desc">Your predicted maths score out of 100 pops up instantly on screen &mdash; and is saved to the history log automatically.</div>
+                    <div class="hiw-step-tags">
+                        <span class="hiw-tag">Instant</span>
+                        <span class="hiw-tag">Saved to DB</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="hiw-cta">
+                <a href="{{ url_for('predict_datapoint') }}" class="btn-primary">Try it now &rarr;</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        Built with <span>ScoreIQ</span> &mdash; ML-powered student analytics
+    </footer>
+
+    <script>
+        function toggleHiw() {
+            var section = document.getElementById('how');
+            var btn     = document.getElementById('hiw-toggle');
+            var isOpen  = section.classList.toggle('hiw--open');
+            btn.textContent = isOpen ? 'Hide \u2191' : 'How it works';
+            if (isOpen) {
+                setTimeout(function () {
+                    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 60);
+            }
+        }
+    </script>
+
+</body>
+</html>
