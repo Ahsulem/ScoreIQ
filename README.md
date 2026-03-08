@@ -1,277 +1,352 @@
-# ScoreIQ — Student Performance Predictor
+﻿# ScoreIQ — Student Performance Predictor
 
 [![Python Version](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Framework](https://img.shields.io/badge/Framework-Flask-green.svg)](https://flask.palletsprojects.com/)
+[![GitHub](https://img.shields.io/badge/GitHub-Ahsulem%2FScoreIQ-181717?logo=github)](https://github.com/Ahsulem/ScoreIQ)
 
-**ScoreIQ** is an ML-powered web application that predicts student math scores based on demographic and academic performance data. Built with Flask, scikit-learn, and GitHub OAuth, this project demonstrates a complete end-to-end ML workflow — from data exploration to a production-ready web app with user authentication and prediction history.
+**ScoreIQ** is an end-to-end machine learning web application that predicts a student's math exam score based on demographic and academic inputs. Built with Flask, scikit-learn, CatBoost, and GitHub OAuth, it demonstrates a complete ML workflow — from exploratory data analysis to a production-ready web app with user authentication and persistent prediction history.
+
+---
 
 ## 📋 Table of Contents
 
-1.  [Project Overview](#project-overview)
-3.  [Features](#features)
-4.  [Technology Stack](#technology-stack)
-5.  [Project Architecture & Workflow](#project-architecture-&-workflow)
-6.  [Getting Started](#getting-started)
-7.  [Running the Application](#running-the-application)
-8.  [Jupyter Notebooks](#jupyter-notebooks)
-9.  [Development Workflow](#development-workflow)
-10. [Model Performance](#model-performance)
-11. [Configuration](#configuration)
-12. [Troubleshooting](#troubleshooting)
-13. [API Endpoints](#api-endpoints)
-14. [Contributing](#contributing)
-15. [License](#license)
-16. [Future Enhancements](#future-enhancements)
+1. [Project Overview](#-project-overview)
+2. [Live Demo](#-live-demo)
+3. [Features](#-features)
+4. [Technology Stack](#️-technology-stack)
+5. [Project Architecture](#️-project-architecture)
+6. [Getting Started](#-getting-started)
+7. [Running the Application](#-running-the-application)
+8. [API Endpoints](#-api-endpoints)
+9. [Jupyter Notebooks](#-jupyter-notebooks)
+10. [Model Performance](#-model-performance)
+11. [Configuration](#️-configuration)
+12. [Troubleshooting](#-troubleshooting)
+13. [Contributing](#-contributing)
+14. [License](#-license)
+15. [Future Enhancements](#-future-enhancements)
 
+---
 
-## <a id="project-overview"></a>📖 Project Overview
-<!-- ## 📖 Project Overview -->
+## 📖 Project Overview
 
-**ScoreIQ** aims to understand and predict student performance in mathematics. By analyzing features such as gender, ethnicity, parental education level, and test preparation, it builds a model that provides an accurate estimate of a student's math score.
+**ScoreIQ** aims to understand and predict student performance in mathematics. By analyzing features such as gender, race/ethnicity, parental education level, lunch type, and test preparation course, it builds a regression model that estimates a student's math score with high accuracy.
 
-The application is a production-ready machine learning system with a Neo-Minimalist web interface, user authentication (email/password + GitHub OAuth), and prediction history — both session-based for anonymous users and database-backed for registered accounts.
+The application is a production-ready system featuring:
+- A clean, Neo-Minimalist web interface
+- Email/password authentication and **GitHub OAuth** (one-click sign-in)
+- Session-based prediction history for anonymous users, seamlessly migrated to a database-backed account upon sign-up or login
+- AWS Elastic Beanstalk deployment support out of the box
 
-## <a id="features"></a>✨ Features
-<!-- ## ✨ Features -->
+---
 
--   **Predictive Modeling**: Utilizes regression models to predict student math scores.
--   **Comprehensive EDA**: Detailed exploratory data analysis to uncover insights and relationships in the data.
--   **Multi-Model Evaluation**: Trains and evaluates several models (Random Forest, Decision Tree, Gradient Boosting, Linear Regression, CatBoost, AdaBoost, and K-Neighbors) to select the best performer.
--   **Hyperparameter Tuning**: Employs `GridSearchCV` to find the optimal parameters for each model.
--   **Modular Pipeline**: A structured, reusable pipeline for data ingestion, transformation, and model training.
-- **Model Persistence**: Saved trained models and preprocessors into pickle files for production use.
--   **Web Interface**: A user-friendly web form built with Flask to input student data and receive instant predictions.
--   **Robust Engineering**: Features custom logging, exception handling, and a modular project structure for maintainability.
+## 🌐 Live Demo
 
-## <a id="technology-stack"></a>🛠️ Technology Stack
-<!-- ## 🛠️ Technology Stack -->
+> Clone the repo and run locally — see [Getting Started](#-getting-started).
 
--   **Backend**: Flask
--   **ML & Data Science**: Scikit-learn, CatBoost, Pandas, NumPy
--   **Data Visualization**: Matplotlib, Seaborn
--   **Development Environment**: Jupyter Notebook, **uv** (or venv/pip)
--   **Deployment**: AWS EC2 with Elastic Beanstalk
+---
 
-## <a id="project-architecture-&-workflow"></a>🏗️ Project Architecture & Workflow
-<!-- ## 🏗️ Project Architecture & Workflow -->
+## ✨ Features
 
-The project is organized into a modular structure that separates concerns and makes the system easy to maintain and scale.
+| Feature | Description |
+|---|---|
+| 🔮 **Math Score Prediction** | Instantly predict a student's math exam score from 7 input features |
+| 📊 **Comprehensive EDA** | Detailed exploratory data analysis with visualizations in Jupyter |
+| 🤖 **Multi-Model Training** | Trains 7 regression algorithms and selects the best via GridSearchCV |
+| 🔐 **User Authentication** | Email/password sign-up & login powered by Flask-Login |
+| 🐙 **GitHub OAuth** | One-click sign-in via GitHub using Flask-Dance |
+| 📜 **Prediction History** | Full history persisted per user in SQLite (anonymous users use Flask session) |
+| 🔄 **Session Migration** | Predictions made before login are automatically migrated to the user's account |
+| 🏗️ **Modular ML Pipeline** | Clean separation of data ingestion, transformation, and model training |
+| 📝 **Custom Logging & Exceptions** | Structured logging and rich exception traces for easy debugging |
+| ☁️ **AWS-Ready** | `.ebextensions` config for one-command Elastic Beanstalk deployment |
 
-### Directory Structure
+---
+
+## 🛠️ Technology Stack
+
+**Backend & Web**
+- [Flask](https://flask.palletsprojects.com/) — web framework
+- [Flask-Login](https://flask-login.readthedocs.io/) — session management & user authentication
+- [Flask-Dance](https://flask-dance.readthedocs.io/) — GitHub OAuth 2.0
+- [Flask-SQLAlchemy](https://flask-sqlalchemy.palletsprojects.com/) + SQLite — user & prediction storage
+- [Werkzeug](https://werkzeug.palletsprojects.com/) — password hashing
+
+**Machine Learning & Data Science**
+- [scikit-learn](https://scikit-learn.org/) — preprocessing pipelines, models, GridSearchCV
+- [CatBoost](https://catboost.ai/) — gradient boosting regressor
+- [Pandas](https://pandas.pydata.org/) & [NumPy](https://numpy.org/) — data manipulation
+- [Matplotlib](https://matplotlib.org/) & [Seaborn](https://seaborn.pydata.org/) — visualization
+
+**Tooling & Deployment**
+- [uv](https://github.com/astral-sh/uv) — fast Python package manager (recommended)
+- Jupyter Notebook — EDA & experimentation
+- AWS Elastic Beanstalk — cloud deployment
+
+---
+
+## 🏗️ Project Architecture
 
 ```
-├── artifacts/                          # Stores output files like models and preprocessors
-│   ├── model.pkl                       # Trained model object
-│   └── preprocessor.pkl                # Preprocessing pipeline object
-├── notebooks/                          # Jupyter notebooks for EDA and initial modeling
-├── src/                                # Source code for the application
-│   ├── components/                     # Core ML pipeline components
-│   │   ├── data_ingestion.py           # Data loading and splitting
-│   │   ├── data_transformation.py      # Feature engineering and preprocessing
-│   │   └── model_trainer.py            # Model training and evaluation
-│   ├── pipeline/                       # Manages training and prediction workflows
-│   │   ├── prediction_pipeline.py
-│   │   └── training_pipeline.py   
-│   ├── exception.py                    # Custom exception handling
-│   ├── logger.py                       # Logging configuration
-│   └── utils.py                        # Utility functions
-├── application.py                      # Main Flask application entry point
-├── requirements.txt                    # Project dependencies
-└── README.md                           # This file
+ScoreIQ/
+├── application.py                   # Flask app — routes, auth, DB models
+├── main.py                          # Entry point alias
+├── requirements.txt                 # Project dependencies
+├── setup.py / pyproject.toml        # Package config
+│
+├── src/                             # Core source code
+│   ├── components/
+│   │   ├── data_ingestion.py        # Load CSV → split → save train/test artifacts
+│   │   ├── data_transformation.py   # ColumnTransformer pipeline → preprocessor.pkl
+│   │   └── model_trainer.py         # GridSearchCV over 7 models → model.pkl
+│   ├── pipeline/
+│   │   ├── training_pipeline.py     # Orchestrates ingestion → transform → train
+│   │   └── prediction_pipeline.py   # Loads artifacts → transforms input → predicts
+│   ├── exception.py                 # CustomError with full traceback context
+│   ├── logger.py                    # Timestamped rotating file logger
+│   └── utils.py                     # save_object / load_object / evaluate_models
+│
+├── artifacts/                       # Auto-generated ML outputs (gitignored)
+│   ├── model.pkl
+│   ├── preprocessor.pkl
+│   ├── train.csv / test.csv / data.csv
+│
+├── notebooks/
+│   ├── 1 . EDA STUDENT PERFORMANCE .ipynb
+│   ├── 2. MODEL TRAINING.ipynb
+│   └── data/stud.csv                # Raw dataset
+│
+├── templates/                       # Jinja2 HTML templates
+│   ├── index.html                   # Landing page
+│   ├── home.html                    # Prediction form & result
+│   ├── history.html                 # Prediction history
+│   ├── login.html
+│   └── signup.html
+│
+├── static/css/styles.css            # Application stylesheet
+├── instance/predictions.db          # SQLite database (auto-created)
+├── logs/                            # Runtime log files (gitignored)
+└── .ebextensions/python.config      # AWS Elastic Beanstalk config
 ```
 
-### ML Pipeline Workflow
+### ML Pipeline Flow
 
-1.  **Data Ingestion (`data_ingestion.py`)**:
-    -   Reads the raw data from `notebooks/data/stud.csv`.
-    -   Splits the data into training and testing sets.
-    -   Saves the raw, train, and test CSVs into the `artifacts/` directory.
-    -   Triggers the data transformation and model training steps.
+```
+notebooks/data/stud.csv
+        │
+        ▼
+data_ingestion.py  ──→  artifacts/train.csv + test.csv
+        │
+        ▼
+data_transformation.py  ──→  artifacts/preprocessor.pkl
+  • Numerical: SimpleImputer(median) + StandardScaler
+  • Categorical: SimpleImputer(most_frequent) + OneHotEncoder + StandardScaler
+        │
+        ▼
+model_trainer.py  ──→  artifacts/model.pkl
+  • Models: LinearRegression, DecisionTree, RandomForest,
+            GradientBoosting, CatBoost, AdaBoost, KNeighbors
+  • Selection: GridSearchCV → highest R² (min threshold: 0.6)
+        │
+        ▼
+prediction_pipeline.py
+  • Loads preprocessor.pkl + model.pkl
+  • Transforms user input → predicts math score
+```
 
-2.  **Data Transformation (`data_transformation.py`)**:
-    -   Creates a preprocessing pipeline using `ColumnTransformer`.
-    -   Applies `StandardScaler` to numerical features and `OneHotEncoder` to categorical features.
-    -   Saves the fitted preprocessor object as `preprocessor.pkl` for later use.
+---
 
-3.  **Model Training (`model_trainer.py`)**:
-    -   Receives the transformed data.
-    -   Runs a suite of regression models through `GridSearchCV` to find the best model and hyperparameters.
-    -   Selects the model with the highest R² score (minimum threshold of 0.6).
-    -   Saves the best-performing model as `model.pkl`.
+## 🚀 Getting Started
 
-4.  **Prediction (`prediction_pipeline.py` & `application.py`)**:
-    -   The Flask app captures user input from the web form.
-    -   The `PredictPipeline` loads the saved `preprocessor.pkl` and `model.pkl`.
-    -   It transforms the new input data and feeds it to the model to generate a prediction, which is then displayed to the user.
+### Prerequisites
 
-## <a id="getting-started"></a>🚀 Getting Started
-<!-- ## 🚀 Getting Started -->
+- Python 3.8+
+- Git
 
-### Step 1: Clone the Repository
-
-First, clone the repository and navigate to the project directory:
+### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/GoJo-Rika/Student-Performance-Prediction-System.git
-cd Student-Performance-Prediction-System
+git clone https://github.com/Ahsulem/ScoreIQ.git
+cd ScoreIQ
 ```
 
-### Step 2: Set Up The Environment and Install Dependencies
-We recommend using `uv`, a fast, next-generation Python package manager, for setup.
+### 2. Set Up the Environment
 
-#### Recommended Approach (using `uv`)
-1.  **Install `uv`** on your system if you haven't already.
-    ```bash
-    # On macOS and Linux
-    curl -LsSf https://astral.sh/uv/install.sh | sh
-
-    # On Windows
-    powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
-    ```
-
-2.  **Create a virtual environment and install dependencies** with a single command:
-    ```bash
-    uv sync
-    ```
-    This command automatically creates a `.venv` folder in your project directory and installs all listed packages from `requirements.txt`.
-
-    > **Note**: For a comprehensive guide on `uv`, check out this detailed tutorial: [uv-tutorial-guide](https://github.com/GoJo-Rika/uv-tutorial-guide).
-
-#### Alternative Approach (using `venv` and `pip`)
-If you prefer to use the standard `venv` and `pip`:
-1.  **Create and activate a virtual environment:**
-    ```bash
-    python -m venv venv
-    source venv/bin/activate  # On Windows use: venv\Scripts\activate
-    ```
-
-2.  **Install the required dependencies:**
-    ```bash
-    pip install -r requirements.txt  # Using uv: uv add -r requirements.txt
-    ```
-
-## <a id="running-the-application"></a>👟 Running the Application
-<!-- ## 👟 Running the Application -->
-
-Follow these steps to run the project locally.
-
-### Step 1: Run the Training Pipeline
-
-Before you can run the web application for the first time, you need to train the model. This will generate the necessary `model.pkl` and `preprocessor.pkl` files in the `artifacts/` directory.
+#### Recommended — using `uv`
 
 ```bash
-python src/components/data_ingestion.py     # Using uv: uv run src/components/data_ingestion.py
+# Install uv (if not already installed)
+# Windows:
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+
+# macOS / Linux:
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Create virtual environment and install all dependencies
+uv sync
 ```
 
-This single command will execute the entire training workflow: data ingestion, transformation, and model training.
-
-### Step 2: Start the Prediction Server
-
-Once the training is complete and the artifacts are saved, start the Flask web server:
+#### Alternative — using `venv` + `pip`
 
 ```bash
-python application.py   # Using uv: uv run application.py
+python -m venv venv
+
+# Windows
+venv\Scripts\activate
+
+# macOS / Linux
+source venv/bin/activate
+
+pip install -r requirements.txt
 ```
 
-### Step 3: Access the Web App
+---
 
-Open your web browser and navigate to:
-**http://127.0.0.1:5000**
+## 👟 Running the Application
 
-You can now use the form to input student data and get a math score prediction.
+### Step 1 — Train the Model
 
-## <a id="jupyter-notebooks"></a>🧪 Jupyter Notebooks
-<!-- ## 🧪 Jupyter Notebooks -->
+The `artifacts/` directory is gitignored. Run the training pipeline once to generate `model.pkl` and `preprocessor.pkl`:
 
-The `notebooks/` directory contains two key notebooks that document the project's development:
-
-1.  **`1 . EDA STUDENT PERFORMANCE .ipynb`**: This notebook contains a detailed Exploratory Data Analysis (EDA) of the student dataset, including visualizations and key insights that informed the feature engineering and model selection process.
-2.  **`2. MODEL TRAINING.ipynb`**: This notebook shows the initial model training and evaluation experiments. It serves as a scratchpad for testing different models and preprocessing steps before they were refactored into the main `src` pipeline.
-
-## <a id="development-workflow"></a>🔄 Development Workflow
-<!-- ## 🔄 Development Workflow -->
-
-This project follows a modular, pipeline-based architecture:
-
-1. **Experimentation**: Initial development in Jupyter notebooks
-2. **Modularization**: Successful experiments converted to reusable components
-3. **Pipeline Integration**: Components connected in training and prediction pipelines
-4. **Error Handling**: Custom exceptions and logging for debugging
-5. **Testing**: Iterative testing and refinement
-6. **Deployment**: AWS EC2 deployment with Elastic Beanstalk configuration
-
-## <a id="model-performance"></a>📈 Model Performance
-<!-- ## 📈 Model Performance -->
-
-The system evaluates multiple algorithms and selects the best performer:
-- Minimum R² score threshold: 0.6
-- Grid search hyperparameter optimization
-- Cross-validation for robust evaluation
-
-## <a id="configuration"></a>🔧 Configuration
-<!-- ## 🔧 Configuration -->
-
-### AWS Deployment
-- **EC2 Instance**: Configured via `.ebextensions/python.config`
-- **WSGI**: Flask application served through `application:application`
-- **Environment**: Production-ready with proper logging
-
-### File Structure
-```
-artifacts/
-├── model.pkl               # Trained model
-├── preprocessor.pkl        # Feature transformation pipeline
-├── train.csv               # Training data
-├── test.csv                # Test data
-└── data.csv                # Raw data
-
-logs/
-└── [timestamp].log         # Application logs
+```bash
+python src/components/data_ingestion.py
+# or with uv:
+uv run src/components/data_ingestion.py
 ```
 
-## <a id="troubleshooting"></a>🐛 Troubleshooting
-<!-- ## 🐛 Troubleshooting -->
+This executes the full pipeline: data ingestion → transformation → model training.
 
-**Common Issues:**
-1. **Import errors**: Ensure all dependencies are installed
-2. **Data not found**: Check `notebooks/data/stud.csv` exists
-3. **Model not found**: Run training pipeline first
-4. **Prediction errors**: Check input data format
+### Step 2 — Start the Flask Server
 
-**Debugging:**
-- Check logs in `logs/` directory
-- Custom exceptions provide detailed error context
-- Use logging output for pipeline debugging
+```bash
+python application.py
+# or with uv:
+uv run application.py
+```
 
-## <a id="api-endpoints"></a>📝 API Endpoints
-<!-- ## 📝 API Endpoints -->
+### Step 3 — Open the App
 
-- `GET /`: Home page
-- `GET /predictdata`: Prediction form
-- `POST /predictdata`: Submit prediction request
+Navigate to **http://127.0.0.1:5000** in your browser.
 
-## <a id="contributing"></a>🤝 Contributing
-<!-- ## 🤝 Contributing -->
+---
 
-Contributions are welcome! If you have suggestions or want to improve the project, please follow these steps:
+## 📝 API Endpoints
 
-1.  Fork the repository.
-2.  Create a new feature branch (`git checkout -b feature/your-feature-name`).
-3.  Make your changes and commit them (`git commit -m 'Add some feature'`).
-4.  Push to the branch (`git push origin feature/your-feature-name`).
-5.  Open a Pull Request.
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| `GET` | `/` | Landing page | No |
+| `GET` | `/predictdata` | Prediction form | No |
+| `POST` | `/predictdata` | Submit prediction | No |
+| `GET` | `/history` | User prediction history | No (session) / Yes (DB) |
+| `GET` | `/signup` | Sign-up form | No |
+| `POST` | `/signup` | Create account | No |
+| `GET` | `/login` | Login form | No |
+| `POST` | `/login` | Authenticate user | No |
+| `GET` | `/login-github` | Initiate GitHub OAuth | No |
+| `GET` | `/logout` | Log out current user | Yes |
 
-## <a id="license"></a>📄 License
-<!-- ## 📄 License -->
+---
 
-This project is licensed under the MIT License. See the `LICENSE` file for more details.
+## 🧪 Jupyter Notebooks
 
-## <a id="future-enhancements"></a>🎯 Future Enhancements
-<!-- ## 🎯 Future Enhancements -->
+Located in `notebooks/`:
 
-- REST API for programmatic access
-- Model training & retraining pipeline
-- Performance monitoring dashboard
-- Additional ML algorithms
-- A/B testing framework
+| Notebook | Description |
+|----------|-------------|
+| `1 . EDA STUDENT PERFORMANCE .ipynb` | Exploratory data analysis — distributions, correlations, and visualizations that informed feature selection and preprocessing decisions |
+| `2. MODEL TRAINING.ipynb` | Initial model experiments — benchmarking all 7 algorithms before refactoring into the `src/` pipeline |
+
+---
+
+## 📈 Model Performance
+
+Seven regression models are evaluated during training:
+
+| Model | Notes |
+|-------|-------|
+| Linear Regression | Strong baseline for tabular data |
+| Decision Tree | Prone to overfit; tuned with criterion |
+| Random Forest | Ensemble; tuned n_estimators |
+| Gradient Boosting | Learning rate + n_estimators tuned |
+| CatBoost Regressor | Handles categoricals natively; depth + learning_rate tuned |
+| AdaBoost Regressor | Learning rate + n_estimators tuned |
+| K-Neighbors Regressor | n_neighbors + weights tuned |
+
+- **Selection criterion**: Highest R² score on the test set
+- **Minimum threshold**: R² ≥ 0.6 (raises error otherwise)
+- **Optimization**: `GridSearchCV` with cross-validation
+
+---
+
+## ⚙️ Configuration
+
+### GitHub OAuth
+
+Update the credentials in `application.py` if you want to use your own GitHub OAuth App:
+
+```python
+app.config["GITHUB_OAUTH_CLIENT_ID"]     = "<your-client-id>"
+app.config["GITHUB_OAUTH_CLIENT_SECRET"] = "<your-client-secret>"
+```
+
+> Create an OAuth App at **GitHub → Settings → Developer settings → OAuth Apps**.  
+> Set the callback URL to `http://127.0.0.1:5000/login/github/authorized`.
+
+### AWS Elastic Beanstalk
+
+The `.ebextensions/python.config` file is pre-configured. To deploy:
+
+```bash
+eb init -p python-3.11 ScoreIQ
+eb create scoreiq-env
+eb deploy
+```
+
+Ensure `artifacts/model.pkl` and `artifacts/preprocessor.pkl` are included before deploying (they are gitignored by default).
+
+---
+
+## 🐛 Troubleshooting
+
+| Problem | Solution |
+|---------|----------|
+| `FileNotFoundError: artifacts/model.pkl` | Run `python src/components/data_ingestion.py` first |
+| `ModuleNotFoundError` | Activate your virtual environment and run `pip install -r requirements.txt` |
+| GitHub OAuth redirect error | Verify callback URL in your GitHub OAuth App settings |
+| Port already in use | Change port: `app.run(port=5001)` in `application.py` |
+| Blank prediction history | For anonymous users, history is stored in the Flask session (cleared on browser close) — sign up to save permanently |
+
+Check the `logs/` directory for detailed runtime error traces.
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for full guidelines.
+
+**Quick steps:**
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/your-feature-name`
+3. Commit your changes: `git commit -m "feat: add your feature"`
+4. Push to the branch: `git push origin feature/your-feature-name`
+5. Open a Pull Request
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🎯 Future Enhancements
+
+- [ ] REST API with JWT authentication for programmatic access
+- [ ] Model retraining pipeline triggered from the UI
+- [ ] Performance monitoring dashboard (accuracy drift, input distributions)
+- [ ] Docker container & docker-compose setup
+- [ ] Support for predicting reading and writing scores too
+- [ ] Export prediction history as CSV
+- [ ] A/B testing framework for model comparison in production
