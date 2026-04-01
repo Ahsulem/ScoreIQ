@@ -11,7 +11,7 @@ authors = [
 ]
 description = "ScoreIQ — ML-powered student performance predictor"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.11"
 license = { text = "MIT" }
 classifiers = [
     "Programming Language :: Python :: 3",

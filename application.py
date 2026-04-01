@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 
 from flask import Flask, flash, redirect, render_template, request, session, url_for
@@ -21,13 +22,23 @@ application = Flask(__name__)
 
 app = application
 
+def read_secret(secret_name: str) -> str:
+    """Reads a docker secret from /run/secrets/<name>.
+    Falls back to os.environ if the secret file does not exist.
+    """
+    secret_path = f"/run/secrets/{secret_name}"
+    if os.path.isfile(secret_path):
+        with open(secret_path, "r") as f:
+            return f.read().strip()
+    return os.environ.get(secret_name, "")
+
 # ── Config ────────────────────────────────────────────────────────────────────
-app.config["SECRET_KEY"] = "medicalchatbot"
+app.config["SECRET_KEY"] = read_secret("secret_key")
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///predictions.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 # ── GitHub OAuth credentials ──────────────────────────────────────────────
-app.config["GITHUB_OAUTH_CLIENT_ID"]     = "Ov23lipsQVDpTLA9mEMP"
-app.config["GITHUB_OAUTH_CLIENT_SECRET"] = "aa915dfe6b0bdef3ef1b66ee3a451de19cf76308"
+app.config["GITHUB_OAUTH_CLIENT_ID"]     = read_secret("github_client_id")
+app.config["GITHUB_OAUTH_CLIENT_SECRET"] = read_secret("github_client_secret")
 
 db = SQLAlchemy(app)
 
