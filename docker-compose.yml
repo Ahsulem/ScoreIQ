@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: scoreiq_web
+    ports:
+      - "5000:5000"
+    volumes:
+      - db_data:/app/instance
+    secrets:
+      - github_client_id
+      - github_client_secret
+      - secret_key
+
+volumes:
+  db_data:
+
+secrets:
+  github_client_id:
+    file: ./secrets/github_client_id
+  github_client_secret:
+    file: ./secrets/github_client_secret
+  secret_key:
+    file: ./secrets/secret_key
